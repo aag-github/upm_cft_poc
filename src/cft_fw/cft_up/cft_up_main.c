@@ -9,8 +9,8 @@
 
 bool break_loop = false;
 
-cft_pipe_t signal_in = 0;
-cft_pipe_t signal_out = 0;
+cft_signaled_pipe_in_t  signal_in;
+cft_signaled_pipe_out_t signal_out;
 
 
 void user_plane_signal_handler(int signo)
@@ -20,7 +20,7 @@ void user_plane_signal_handler(int signo)
         printf("received SIGUSR1!!!!!!!!!!!!!!!!!!!!!!!! %d\n", getpid());
 
         int signal_type;
-        read(signal_in, &signal_type, sizeof(signal_type));
+        read(signal_in.pipe_.pipe_descriptor_, &signal_type, sizeof(signal_type));
 
         printf("received type: %d\n", signal_type);
 
@@ -31,14 +31,8 @@ void user_plane_runner() {
 
     signal(SIGUSR1, user_plane_signal_handler);
 
-    char pipe_name[100];
-    sprintf(pipe_name, "/tmp/up_signal_in_%d", getpid());
-    signal_in = open(pipe_name, O_RDONLY);
-
-    sprintf(pipe_name, "/tmp/up_signal_out_%d", getpid());
-    mkfifo(pipe_name, S_IRUSR | S_IWUSR);
-    signal_out = open(pipe_name, O_RDWR);
-
+    cft_signaled_pipe_in_init(&signal_in, "up_signal_in", SIGUSR1);
+    cft_signaled_pipe_out_init(&signal_out, "up_signal_out", SIGUSR1);
 
 
     while(!break_loop) {
@@ -47,7 +41,7 @@ void user_plane_runner() {
     }
     printf("UP done\n");
 
-    close(signal_in);
-    close(signal_out);
+    cft_signaled_pipe_in_fini(&signal_in);
+    cft_signaled_pipe_out_fini(&signal_out);
 
 }

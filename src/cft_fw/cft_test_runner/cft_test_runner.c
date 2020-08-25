@@ -32,7 +32,7 @@ int test_runner()
 
     cft_log("%s: Starting test loop\n", __func__);
     // For each test.... {
-    for(int i = 1; i <= 1; i++) {
+    for(int i = 5; i <= 5; i++) {
         cft_log("%s", "running first test\n");
         if(1 == run_test(dummy_test, i)) {
             cft_worker_manager_stop_all_workers();
