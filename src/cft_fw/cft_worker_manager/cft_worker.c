@@ -14,7 +14,6 @@
 
 struct cft_worker_s {
     pid_t pid_;
-    cft_signaled_pipe_in_t  signal_from_up;
     cft_signaled_pipe_out_t signal_to_up;
 };
 
@@ -25,8 +24,6 @@ bool cft_worker_init(cft_worker_t* self, pid_t pid)
     char pipe_name[QUEUE_NAME_MAX_SIZE];
     sprintf(pipe_name, "up_signal_in_%d", self->pid_);
     cft_signaled_pipe_out_init(&self->signal_to_up, pipe_name, SIGUSR1);
-    sprintf(pipe_name, "up_signal_out_%d", self->pid_);
-    cft_signaled_pipe_in_init(&self->signal_from_up, pipe_name, SIGUSR1);
 
     return true;
 }
@@ -68,6 +65,5 @@ void cft_worker_destroy(cft_worker_t* self)
 {
     cft_worker_stop_worker(self);
 
-    cft_signaled_pipe_in_fini(&self->signal_from_up);
     cft_signaled_pipe_out_fini(&self->signal_to_up);
 }

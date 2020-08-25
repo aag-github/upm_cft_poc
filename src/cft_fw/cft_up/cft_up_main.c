@@ -11,8 +11,8 @@
 bool break_loop = false;
 
 cft_signaled_pipe_in_t  signal_in;
-cft_signaled_pipe_out_t signal_out;
 
+int ppid = 0;
 
 void user_plane_signal_handler(int signo)
 {
@@ -37,13 +37,13 @@ void user_plane_signal_handler(int signo)
     }
 }
 
-void user_plane_runner() {
+void user_plane_runner()
+{
+    ppid = getppid();
 
     signal(SIGUSR1, user_plane_signal_handler);
 
     char pipe_name[QUEUE_NAME_MAX_SIZE];
-    sprintf(pipe_name, "up_signal_out_%d", getpid());
-    cft_signaled_pipe_out_init(&signal_out, pipe_name, SIGUSR1);
     sprintf(pipe_name, "up_signal_in_%d", getpid());
     cft_signaled_pipe_in_init(&signal_in, pipe_name, SIGUSR1);
 
@@ -51,10 +51,12 @@ void user_plane_runner() {
     while(!break_loop) {
         sleep(3);
         printf("CHILD RUNNING: my id is %d\n", getpid());
+
+        if (ppid != getppid()) {
+            break;
+        }
     }
     printf("UP done\n");
 
     cft_signaled_pipe_in_fini(&signal_in);
-    cft_signaled_pipe_out_fini(&signal_out);
-
 }
