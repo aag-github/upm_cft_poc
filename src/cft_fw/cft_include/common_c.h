@@ -4,5 +4,6 @@
 #include <stdbool.h>  // for bool
 #include <stddef.h>   // for NULL
 #include <string.h>   // for memeset
+#include <assert.h>
 
 #endif /* CFT_FW_COMMON_C_H_ */

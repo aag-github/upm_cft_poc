@@ -8,7 +8,7 @@ bool cft_signaled_pipe_init(cft_signaled_pipe_t *self, const char *name, int sig
 {
     memset(self, 0, sizeof(*self));
     self->signal_ = signal;
-    sprintf(self->name_, "/tmp/%s_%d", name, getpid());
+    sprintf(self->name_, "/tmp/%s", name);
     return true;
 }
 

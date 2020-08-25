@@ -4,11 +4,13 @@
 #include <limits.h>
 #include "common_c.h"
 
+#define QUEUE_NAME_MAX_SIZE 150
+
 typedef int cft_pipe_descriptor_t;
 
 struct cft_signaled_pipe_s {
     int signal_;
-    char name_[PATH_MAX];
+    char name_[QUEUE_NAME_MAX_SIZE];
     cft_pipe_descriptor_t pipe_descriptor_;
 };
 typedef struct cft_signaled_pipe_s cft_signaled_pipe_t;

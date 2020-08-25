@@ -9,6 +9,7 @@
 #include "cft_worker.h"
 #include "cft_logger.h"
 #include "cft_queues.h"
+#include "cft_up_messages.h"
 
 
 struct cft_worker_s {
@@ -21,8 +22,11 @@ bool cft_worker_init(cft_worker_t* self, pid_t pid)
 {
     self->pid_ = pid;
 
-    cft_signaled_pipe_in_init(&self->signal_from_up, "up_signal_out", SIGUSR1);
-    cft_signaled_pipe_out_init(&self->signal_to_up, "up_signal_in", SIGUSR1);
+    char pipe_name[QUEUE_NAME_MAX_SIZE];
+    sprintf(pipe_name, "up_signal_in_%d", self->pid_);
+    cft_signaled_pipe_out_init(&self->signal_to_up, pipe_name, SIGUSR1);
+    sprintf(pipe_name, "up_signal_out_%d", self->pid_);
+    cft_signaled_pipe_in_init(&self->signal_from_up, pipe_name, SIGUSR1);
 
     return true;
 }
@@ -52,7 +56,7 @@ void cft_worker_stop_worker(cft_worker_t* self)
 {
     cft_log("%s: Process %d stopping worker... %d\n", __func__, getpid(), self->pid_);
 
-    int kill_signal = 10;
+    int kill_signal = SMT_KILL;
     write(self->signal_to_up.pipe_.pipe_descriptor_, &kill_signal, sizeof(kill_signal));
     kill(self->pid_, SIGUSR1);
 
