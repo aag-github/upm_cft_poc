@@ -41,7 +41,7 @@ cft_worker_id_t cft_worker_manager_start_new_worker()
     int fork_id = fork();
     if (fork_id == 0) {
         cft_log("%s: Started worker... %d\n", __func__,  getpid());
-        user_plane_runner();
+        cft_up_runner();
     } else {
         worker_manager_.workers_[i] = cft_worker_create(fork_id);
     }

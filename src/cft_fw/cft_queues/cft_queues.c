@@ -7,7 +7,6 @@
 bool cft_signaled_pipe_init(cft_signaled_pipe_t *self, const char *name, int signal)
 {
     memset(self, 0, sizeof(*self));
-    self->signal_ = signal;
     sprintf(self->name_, "/tmp/%s", name);
     return true;
 }
@@ -20,11 +19,13 @@ void cft_signaled_pipe_fini(cft_signaled_pipe_t *self)
     unlink(self->name_);
 }
 
-bool cft_signaled_pipe_in_init(cft_signaled_pipe_in_t *self, const char *name, int signal)
+bool cft_signaled_pipe_in_init(cft_signaled_pipe_in_t *self, const char *name, int signal_value, void (*handler)(int))
 {
-    if (!cft_signaled_pipe_init(&self->pipe_, name, signal)) {
+    if (!cft_signaled_pipe_init(&self->pipe_, name, signal_value)) {
         return false;
     }
+
+    signal(signal_value, handler);
 
     self->pipe_.pipe_descriptor_ = open(self->pipe_.name_, O_RDONLY);
 
