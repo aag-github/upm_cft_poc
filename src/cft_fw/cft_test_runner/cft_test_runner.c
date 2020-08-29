@@ -7,6 +7,9 @@
 
 
 void dummy_test() {
+    printf("Press enter to send config %d\n", getpid());
+    getchar();
+    cft_worker_manager_send_config_to_all_workers("First config");
     printf("Press enter to exit %d\n", getpid());
     getchar();
 }
@@ -32,7 +35,7 @@ int test_runner()
 
     cft_log("%s: Starting test loop\n", __func__);
     // For each test.... {
-    for(int i = 5; i <= 6; i++) {
+    for(int i = 2; i <= 2; i++) {
         cft_log("%s", "running first test\n");
         if(1 == run_test(dummy_test, i)) {
             cft_worker_manager_stop_all_workers();

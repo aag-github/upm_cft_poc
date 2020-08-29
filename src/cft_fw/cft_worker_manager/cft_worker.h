@@ -31,4 +31,6 @@ void cft_worker_stop_worker(cft_worker_t* self);
 
 //cft_message_sync_queue_t* cft_worker_get_data_queue : *(cft_worker_t* self);
 
+void cft_worker_send_config(cft_worker_t* self, const char* config);
+
 #endif /* CFT_FW_CFT_WORKER_MANAGER_CFT_WORKER_H_ */

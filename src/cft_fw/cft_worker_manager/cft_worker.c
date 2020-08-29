@@ -9,12 +9,14 @@
 #include "cft_worker.h"
 #include "cft_logger.h"
 #include "cft_queues.h"
+#include "cft_local_socket.h"
 #include "cft_up_messages.h"
 
 
 struct cft_worker_s {
     pid_t pid_;
     cft_signaled_pipe_out_t signal_to_up;
+    cft_local_socket_client_t data_queue;
 };
 
 bool cft_worker_init(cft_worker_t* self, pid_t pid)
@@ -25,11 +27,15 @@ bool cft_worker_init(cft_worker_t* self, pid_t pid)
     sprintf(pipe_name, "up_signal_in_%d", self->pid_);
     cft_signaled_pipe_out_init(&self->signal_to_up, pipe_name, SIGUSR1);
 
+    sprintf(pipe_name, "up_data_in_%d", self->pid_);
+    cft_local_socket_client_init(&self->data_queue, pipe_name);
+
     return true;
 }
 
 void cft_worker_fini(cft_worker_t* self)
 {
+    cft_local_socket_client_fini(&self->data_queue);
 }
 
 cft_worker_id_t cft_worker_get_id(cft_worker_t* self)
@@ -66,4 +72,13 @@ void cft_worker_destroy(cft_worker_t* self)
     cft_worker_stop_worker(self);
 
     cft_signaled_pipe_out_fini(&self->signal_to_up);
+}
+
+void cft_worker_send_config(cft_worker_t* self, const char* config)
+{
+    int msg = DMT_CONFIG;
+    int bytes_sent = cft_local_socket_client_write(&self->data_queue, &msg, sizeof(msg));
+    assert(bytes_sent > 0);
+    bytes_sent = cft_local_socket_client_write(&self->data_queue, (void*)config, strlen(config) + 1);
+    assert(bytes_sent > 0);
 }

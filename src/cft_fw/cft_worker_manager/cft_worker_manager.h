@@ -19,4 +19,6 @@ void cft_worker_manager_stop_all_workers();
 //void resume_all_workers : void();
 //void get_worker_data_queue : cft_msg_sync_queue_t(cft_worker_id_t worker_id);
 
+void cft_worker_manager_send_config_to_all_workers(const char *config);
+
 #endif /* CFT_FW_CFT_WORKER_MANAGER_CFT_WORKER_MANAGER_H_ */

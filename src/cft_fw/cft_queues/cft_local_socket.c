@@ -1,3 +1,4 @@
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <sys/un.h>
@@ -5,6 +6,14 @@
 
 #include "cft_local_socket.h"
 #include "cft_queues.h"
+
+int setnonblock(int sock) {
+   int flags;
+   flags = fcntl(sock, F_GETFL, 0);
+   if (-1 == flags)
+      return -1;
+   return fcntl(sock, F_SETFL, flags | O_NONBLOCK);
+}
 
 bool cft_local_socket_server_init(cft_local_socket_server_t* server_socket, const char *name)
 {
@@ -20,7 +29,7 @@ bool cft_local_socket_server_init(cft_local_socket_server_t* server_socket, cons
     if((server_socket->descriptor_ = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
         return false;
     }
-    // Bind the socket to the address.
+
     if ((bind(server_socket->descriptor_, (struct sockaddr *)&address, sizeof(address))) != 0) {
         return false;
     }
@@ -29,7 +38,7 @@ bool cft_local_socket_server_init(cft_local_socket_server_t* server_socket, cons
         return false;
     }
 
-    struct timeval tv;
+        struct timeval tv;
     tv.tv_sec = 2;
     tv.tv_usec = 0;
     setsockopt(server_socket->descriptor_, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv);
@@ -37,6 +46,8 @@ bool cft_local_socket_server_init(cft_local_socket_server_t* server_socket, cons
     if((server_socket->connection_ = accept(server_socket->descriptor_, (struct sockaddr*)NULL, NULL)) < 0) {
         return false;
     }
+
+    setnonblock(server_socket->connection_ );
 
     return true;
 

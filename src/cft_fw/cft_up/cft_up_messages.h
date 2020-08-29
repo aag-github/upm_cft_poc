@@ -4,7 +4,13 @@
 enum cft_up_signal_message_type {
     SMT_KILL = 1,
     SMT_HEARTBEAT,
+    SMT_PAUSE_PACKET_PROCESS,
+    SMT_RESUME_PACKET_PROCESS,
 };
 
+enum cft_up_data_message_type {
+    DMT_CONFIG = 1,
+    DMT_PACKET,
+};
 
 #endif /* CFT_FW_CFT_UP_CFT_UP_MESSAGES_H_ */

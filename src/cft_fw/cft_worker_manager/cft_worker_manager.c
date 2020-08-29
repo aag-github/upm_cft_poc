@@ -63,4 +63,16 @@ void cft_worker_manager_stop_all_workers()
         }
         worker_manager_.workers_[i] = NULL;
     }
+    cft_log("%s: stopping done", __func__);
+}
+
+void cft_worker_manager_send_config_to_all_workers(const char *config)
+{
+    cft_log("%s: sending config", __func__);
+    for (size_t i = 0; i < MAX_WORKERS; i++) {
+        if (worker_manager_.workers_[i]) {
+            cft_worker_send_config(worker_manager_.workers_[i], config);
+        }
+    }
+    cft_log("%s: sending config done", __func__);
 }
