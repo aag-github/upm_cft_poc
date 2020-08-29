@@ -65,6 +65,8 @@ void cft_up_runner()
             char config[1000];
             cft_local_socket_server_read(&data_queue, config, sizeof(config));
             printf("CHILD %d GOT CONFIG: %s\n", getpid(), config);
+            int return_value = DMT_RETURN_OK;
+            cft_local_socket_server_write(&data_queue, &return_value, sizeof(return_value));
         }
 
     }

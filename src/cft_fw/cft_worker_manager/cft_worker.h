@@ -5,6 +5,7 @@
 #include <sys/types.h>
 
 #include "cft_logger.h"
+#include "cft_local_socket.h"
 
 typedef struct cft_worker_s cft_worker_t;
 
@@ -29,7 +30,7 @@ void cft_worker_stop_worker(cft_worker_t* self);
 
 //void cft_worker_send_resume(cft_worker_t* self);
 
-//cft_message_sync_queue_t* cft_worker_get_data_queue : *(cft_worker_t* self);
+cft_message_sync_queue_t* cft_worker_get_data_queue(cft_worker_t* self);
 
 void cft_worker_send_config(cft_worker_t* self, const char* config);
 

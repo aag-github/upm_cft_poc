@@ -20,6 +20,8 @@ struct cft_local_socket_server_s {
 typedef struct cft_local_socket_client_s cft_local_socket_client_t;
 typedef struct cft_local_socket_server_s cft_local_socket_server_t;
 
+typedef cft_local_socket_client_t cft_message_sync_queue_t;
+
 bool cft_local_socket_server_init(cft_local_socket_server_t* socket, const char *name);
 void cft_local_socket_server_fini(cft_local_socket_server_t* socket);
 int cft_local_socket_server_read(cft_local_socket_server_t* socket, void* buffer, size_t size);
