@@ -11,7 +11,7 @@
 
 bool break_loop = false;
 
-cft_signaled_pipe_in_t  signal_in;
+cft_message_async_queue_in_t  signal_in;
 
 int ppid = 0;
 

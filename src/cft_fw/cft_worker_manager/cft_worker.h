@@ -5,7 +5,7 @@
 #include <sys/types.h>
 
 #include "cft_logger.h"
-#include "cft_local_socket.h"
+#include "cft_queues.h"
 
 typedef struct cft_worker_s cft_worker_t;
 

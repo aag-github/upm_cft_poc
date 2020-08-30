@@ -15,7 +15,7 @@
 
 struct cft_worker_s {
     pid_t pid_;
-    cft_signaled_pipe_out_t signal_to_up;
+    cft_message_async_queue_out_t signal_to_up;
     cft_local_socket_client_t data_queue;
 };
 
