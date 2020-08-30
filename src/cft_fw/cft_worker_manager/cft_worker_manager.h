@@ -3,6 +3,7 @@
 
 #include "common_c.h"
 #include "cft_worker.h"
+#include "cft_queues.h"
 
 bool cft_worker_manager_init();
 
@@ -17,7 +18,9 @@ void cft_worker_manager_stop_all_workers();
 //void send_heartbeat_to_all_workers : void();
 //void pause_all_workers : void();
 //void resume_all_workers : void();
-//void get_worker_data_queue : cft_msg_sync_queue_t(cft_worker_id_t worker_id);
+
+size_t cft_worker_manager_get_num_workers();
+cft_message_sync_queue_t* cft_worker_manager_get_worker_data_queue(size_t index);
 
 void cft_worker_manager_send_config_to_all_workers(const char *config);
 

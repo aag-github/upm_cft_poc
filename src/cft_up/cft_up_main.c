@@ -15,6 +15,8 @@ cft_message_async_queue_in_t  signal_in;
 
 int ppid = 0;
 
+size_t worker_index = -1;
+
 cft_local_socket_server_t data_queue;
 
 void cft_up_signal_handler(int signo)
@@ -38,8 +40,18 @@ void cft_up_signal_handler(int signo)
     }
 }
 
-void cft_up_runner()
+void cft_up_configure()
 {
+    char config[1000];
+    cft_local_socket_server_read(&data_queue, config, sizeof(config));
+    printf("CHILD %d (%lu) GOT CONFIG: %s\n", getpid(), worker_index, config);
+    int return_value = DMT_RETURN_OK;
+    cft_local_socket_server_write(&data_queue, &return_value, sizeof(return_value));
+}
+
+void cft_up_runner(size_t index)
+{
+    worker_index = index;
     ppid = getppid();
 
     char pipe_name[QUEUE_NAME_MAX_SIZE];
@@ -50,9 +62,9 @@ void cft_up_runner()
     cft_local_socket_server_init(&data_queue, pipe_name);
 
     while(!break_loop) {
-        printf("CHILD SLEEPING: my id is %d\n\n", getpid());
-        sleep(5);
-        printf("CHILD RUNNING: my id is %d\n", getpid());
+        //printf("CHILD SLEEPING: my id is %d\n\n", getpid());
+        //sleep(5);
+        //printf("CHILD RUNNING: my id is %d\n", getpid());
 
         if (ppid != getppid()) {
             break;
@@ -60,13 +72,15 @@ void cft_up_runner()
 
         int msg = 0;
         int read_result = cft_local_socket_server_read(&data_queue, &msg, sizeof(msg));
-        printf("CHILD %d GOT READ RESULT: %d\n", getpid(), read_result);
+        //printf("CHILD %d GOT READ RESULT: %d\n", getpid(), read_result);
         if (read_result > 0) {
-            char config[1000];
-            cft_local_socket_server_read(&data_queue, config, sizeof(config));
-            printf("CHILD %d GOT CONFIG: %s\n", getpid(), config);
-            int return_value = DMT_RETURN_OK;
-            cft_local_socket_server_write(&data_queue, &return_value, sizeof(return_value));
+            switch(msg) {
+            case DMT_CONFIG:
+                cft_up_configure();
+                break;
+            default:
+               printf("************ Unexpected message: %d", msg);
+            }
         }
 
     }

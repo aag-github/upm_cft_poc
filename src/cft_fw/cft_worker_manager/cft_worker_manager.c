@@ -41,7 +41,7 @@ cft_worker_id_t cft_worker_manager_start_new_worker()
     int fork_id = fork();
     if (fork_id == 0) {
         cft_log("%s: Started worker... %d\n", __func__,  getpid());
-        cft_up_runner();
+        cft_up_runner(i);
     } else {
         worker_manager_.workers_[i] = cft_worker_create(fork_id);
     }
@@ -66,13 +66,28 @@ void cft_worker_manager_stop_all_workers()
     cft_log("%s: stopping done", __func__);
 }
 
-void cft_worker_manager_send_config_to_all_workers(const char *config)
+size_t cft_worker_manager_get_num_workers()
 {
-    cft_log("%s: sending config", __func__);
+    size_t count = 0;
     for (size_t i = 0; i < MAX_WORKERS; i++) {
         if (worker_manager_.workers_[i]) {
-            cft_worker_send_config(worker_manager_.workers_[i], config);
+            count++;
         }
     }
-    cft_log("%s: sending config done", __func__);
+    return count;
 }
+
+cft_message_sync_queue_t* cft_worker_manager_get_worker_data_queue(size_t index)
+{
+    size_t count = -1;
+    for (size_t i = 0; i < MAX_WORKERS; i++) {
+        if (worker_manager_.workers_[i]) {
+            count++;
+            if (count == index) {
+                return cft_worker_get_data_queue(worker_manager_.workers_[i]);
+            }
+        }
+    }
+    return NULL;
+}
+

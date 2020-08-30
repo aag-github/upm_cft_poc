@@ -74,20 +74,6 @@ void cft_worker_destroy(cft_worker_t* self)
     cft_signaled_pipe_out_fini(&self->signal_to_up);
 }
 
-void cft_worker_send_config(cft_worker_t* self, const char* config)
-{
-    int msg = DMT_CONFIG;
-    int bytes_sent = cft_local_socket_client_write(&self->data_queue, &msg, sizeof(msg));
-    assert(bytes_sent > 0);
-    bytes_sent = cft_local_socket_client_write(&self->data_queue, (void*)config, strlen(config) + 1);
-    assert(bytes_sent > 0);
-    int return_value = 0;
-    bytes_sent = cft_local_socket_client_read(&self->data_queue, (void*)&return_value, sizeof(return_value));
-    assert(bytes_sent > 0);
-    assert(return_value == DMT_RETURN_OK);
-
-}
-
 cft_message_sync_queue_t* cft_worker_get_data_queue(cft_worker_t* self)
 {
     return &self->data_queue;
