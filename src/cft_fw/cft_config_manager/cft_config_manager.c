@@ -25,11 +25,14 @@ void cft_config_manager_send_config_to_all_workers()
     for (size_t i = 0; i < cft_worker_manager_get_num_workers(); i++) {
         cft_message_sync_queue_t *data_queue = cft_worker_manager_get_worker_data_queue(i);
 
+        // Send packet to UP
         int msg = DMT_CONFIG;
         int bytes_sent = cft_local_socket_client_write(data_queue, &msg, sizeof(msg));
         assert(bytes_sent > 0);
         bytes_sent = cft_local_socket_client_write(data_queue, (void*)xml_config, strlen(xml_config) + 1);
         assert(bytes_sent > 0);
+
+        // Wait for response from UP
         int return_value = 0;
         bytes_sent = cft_local_socket_client_read(data_queue, (void*)&return_value, sizeof(return_value));
         assert(bytes_sent > 0);

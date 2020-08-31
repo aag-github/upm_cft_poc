@@ -5,5 +5,6 @@
 #include <stddef.h>   // for NULL
 #include <string.h>   // for memeset
 #include <assert.h>
+#include <stdint.h>
 
 #endif /* CFT_FW_COMMON_C_H_ */

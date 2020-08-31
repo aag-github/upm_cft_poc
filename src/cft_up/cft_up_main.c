@@ -8,6 +8,7 @@
 #include "cft_queues.h"
 #include "cft_local_socket.h"
 #include "cft_up_messages.h"
+#include "cft_packet.h"
 
 bool break_loop = false;
 
@@ -45,6 +46,24 @@ void cft_up_configure()
     char config[1000];
     cft_local_socket_server_read(&data_queue, config, sizeof(config));
     printf("CHILD %d (%lu) GOT CONFIG: %s\n", getpid(), worker_index, config);
+
+    int return_value = DMT_RETURN_OK;
+    cft_local_socket_server_write(&data_queue, &return_value, sizeof(return_value));
+}
+
+
+void cft_up_send_packet()
+{
+    cft_packet_t packet;;
+    cft_local_socket_server_read(&data_queue, &packet, sizeof(packet));
+    printf("CHILD %d (%lu) GOT PACKET: proto: %d, src_port: %d, dst_port: %d, uplink: %d\n"
+                , getpid()
+                , worker_index
+                , packet.five_tuple_.proto
+                , packet.five_tuple_.src_port_
+                , packet.five_tuple_.dst_port_
+                , packet.uplink_);
+
     int return_value = DMT_RETURN_OK;
     cft_local_socket_server_write(&data_queue, &return_value, sizeof(return_value));
 }
@@ -78,8 +97,11 @@ void cft_up_runner(size_t index)
             case DMT_CONFIG:
                 cft_up_configure();
                 break;
+            case DMT_PACKET:
+                cft_up_send_packet();
+                break;
             default:
-               printf("************ Unexpected message: %d", msg);
+               printf("************ Unexpected message: %d\n", msg);
             }
         }
 
