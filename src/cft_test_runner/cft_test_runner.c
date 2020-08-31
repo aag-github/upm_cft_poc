@@ -7,6 +7,7 @@
 #include "cft_config_manager.h"
 #include "cft_packet_manager.h"
 #include "cft_worker_manager.h"
+#include "cft_routing_manager.h"
 
 
 void dummy_test() {
@@ -31,10 +32,14 @@ void dummy_test() {
     //Send packet 1 to worker 0
     cft_packet_manager_send_packet(&packets[0]);
     //Send packet 2 to worker 1
+    cft_routing_manager_add_flow(&packets[1].five_tuple_, cft_worker_manager_get_worker_id(1));
     cft_packet_manager_send_packet(&packets[1]);
-    //Send packet 3 to worker 0
+    //Send packet 3 to worker 1
+    cft_routing_manager_add_flow(&packets[2].five_tuple_, cft_worker_manager_get_worker_id(1));
     cft_packet_manager_send_packet(&packets[2]);
     //Send packet 4 to worker 0
+    cft_flow_t* flow = cft_routing_manager_find_flow(&packets[3].five_tuple_);
+    cft_flow_set_next_hop(flow, cft_worker_manager_get_worker_id(0));
     cft_packet_manager_send_packet(&packets[3]);
     getchar();
 }

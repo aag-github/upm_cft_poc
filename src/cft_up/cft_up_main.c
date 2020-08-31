@@ -45,7 +45,7 @@ void cft_up_configure()
 {
     char config[1000];
     cft_local_socket_server_read(&data_queue, config, sizeof(config));
-    printf("CHILD %d (%lu) GOT CONFIG: %s\n", getpid(), worker_index, config);
+    printf("WORKER %d (%lu) GOT CONFIG: %s\n", getpid(), worker_index, config);
 
     int return_value = DMT_RETURN_OK;
     cft_local_socket_server_write(&data_queue, &return_value, sizeof(return_value));
@@ -56,13 +56,13 @@ void cft_up_send_packet()
 {
     cft_packet_t packet;;
     cft_local_socket_server_read(&data_queue, &packet, sizeof(packet));
-    printf("CHILD %d (%lu) GOT PACKET: proto: %d, src_port: %d, dst_port: %d, uplink: %d\n"
+    printf("WORKER %d (%lu) GOT PACKET: proto: %d, src_port: %d, dst_port: %d, %s\n"
                 , getpid()
                 , worker_index
                 , packet.five_tuple_.proto
                 , packet.five_tuple_.src_port_
                 , packet.five_tuple_.dst_port_
-                , packet.uplink_);
+                , packet.uplink_ ? "uplink" : "downlink");
 
     int return_value = DMT_RETURN_OK;
     cft_local_socket_server_write(&data_queue, &return_value, sizeof(return_value));
@@ -81,9 +81,9 @@ void cft_up_runner(size_t index)
     cft_local_socket_server_init(&data_queue, pipe_name);
 
     while(!break_loop) {
-        //printf("CHILD SLEEPING: my id is %d\n\n", getpid());
+        //printf("WORKER SLEEPING: my id is %d\n\n", getpid());
         //sleep(5);
-        //printf("CHILD RUNNING: my id is %d\n", getpid());
+        //printf("WORKER RUNNING: my id is %d\n", getpid());
 
         if (ppid != getppid()) {
             break;
@@ -91,7 +91,7 @@ void cft_up_runner(size_t index)
 
         int msg = 0;
         int read_result = cft_local_socket_server_read(&data_queue, &msg, sizeof(msg));
-        //printf("CHILD %d GOT READ RESULT: %d\n", getpid(), read_result);
+        //printf("WORKER %d GOT READ RESULT: %d\n", getpid(), read_result);
         if (read_result > 0) {
             switch(msg) {
             case DMT_CONFIG:

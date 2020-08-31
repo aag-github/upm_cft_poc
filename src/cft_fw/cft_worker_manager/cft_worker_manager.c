@@ -77,7 +77,19 @@ size_t cft_worker_manager_get_num_workers()
     return count;
 }
 
-cft_message_sync_queue_t* cft_worker_manager_get_worker_data_queue(size_t index)
+cft_message_sync_queue_t* cft_worker_manager_get_worker_data_queue_by_id(cft_worker_id_t id)
+{
+    for (size_t i = 0; i < MAX_WORKERS; i++) {
+        if (worker_manager_.workers_[i]) {
+            if (cft_worker_get_id(worker_manager_.workers_[i]) == id) {
+                return cft_worker_get_data_queue(worker_manager_.workers_[i]);
+            }
+        }
+    }
+    return NULL;
+}
+
+cft_message_sync_queue_t* cft_worker_manager_get_worker_data_queue_by_index(size_t index)
 {
     size_t count = -1;
     for (size_t i = 0; i < MAX_WORKERS; i++) {
@@ -91,3 +103,27 @@ cft_message_sync_queue_t* cft_worker_manager_get_worker_data_queue(size_t index)
     return NULL;
 }
 
+cft_worker_id_t cft_worker_manager_get_worker_id(size_t index) {
+    size_t count = -1;
+    for (size_t i = 0; i < MAX_WORKERS; i++) {
+        if (worker_manager_.workers_[i]) {
+            count++;
+            if (count == index) {
+                return cft_worker_get_id(worker_manager_.workers_[i]);
+            }
+        }
+    }
+    return BAD_WORKER_ID;
+}
+
+cft_worker_t* cft_worker_manager_find_worker(cft_worker_id_t id)
+{
+    for (size_t i = 0; i < MAX_WORKERS; i++) {
+        if (worker_manager_.workers_[i]) {
+            if (cft_worker_get_id(worker_manager_.workers_[i]) == id) {
+                return worker_manager_.workers_[i];
+            }
+        }
+    }
+    return NULL;
+}

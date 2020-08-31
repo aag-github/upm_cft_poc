@@ -8,6 +8,8 @@ enum {
     PKT_DIR_UPLINK = 1,
 } cft_pkt_direction_t;
 
+//TODO: Esto no es una implementación real de una five tuple, es solo una simplificación para poder probar el
+//      cft_router_manager
 struct cft_five_tuple_s {
     uint8_t proto;
     //int src_ip_;
@@ -17,7 +19,7 @@ struct cft_five_tuple_s {
 };
 typedef struct cft_five_tuple_s cft_five_tuple_t;
 
-bool cft_five_tuple_is_equal(cft_five_tuple_t *first, cft_five_tuple_t *second);
+bool cft_five_tuple_is_equal(const cft_five_tuple_t *first, const cft_five_tuple_t *second);
 
 struct cft_packet_s {
     uint8_t* raw_packet_;

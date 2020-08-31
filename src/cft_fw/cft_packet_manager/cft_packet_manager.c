@@ -3,13 +3,19 @@
 #include "cft_packet_manager.h"
 #include "cft_up_messages.h"
 #include "cft_worker_manager.h"
+#include "cft_routing_manager.h"
 
 void cft_packet_manager_send_packet(cft_packet_t *packet)
 {
     cft_log("%s: sending packet", __func__);
-    size_t worker = 0;//cft_routing_manager_get_worker_index(packet);
 
-    cft_message_sync_queue_t *data_queue = cft_worker_manager_get_worker_data_queue(worker);
+    cft_message_sync_queue_t *data_queue;
+    cft_flow_t *flow = cft_routing_manager_find_flow(&packet->five_tuple_);
+    if(flow) {
+        data_queue = cft_worker_manager_get_worker_data_queue_by_id(flow->next_hop_);
+    } else {
+        data_queue = cft_worker_manager_get_worker_data_queue_by_index(0);
+    }
 
     // Send packet to UP
     int msg = DMT_PACKET;

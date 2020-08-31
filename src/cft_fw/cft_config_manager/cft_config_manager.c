@@ -23,7 +23,7 @@ void cft_config_manager_send_config_to_all_workers()
 {
     cft_log("%s: sending config", __func__);
     for (size_t i = 0; i < cft_worker_manager_get_num_workers(); i++) {
-        cft_message_sync_queue_t *data_queue = cft_worker_manager_get_worker_data_queue(i);
+        cft_message_sync_queue_t *data_queue = cft_worker_manager_get_worker_data_queue_by_index(i);
 
         // Send packet to UP
         int msg = DMT_CONFIG;

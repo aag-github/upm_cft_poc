@@ -1,6 +1,6 @@
 #include "cft_packet.h"
 
-bool cft_five_tuple_is_equal(cft_five_tuple_t *first, cft_five_tuple_t *second)
+bool cft_five_tuple_is_equal(const cft_five_tuple_t *first, const cft_five_tuple_t *second)
 {
     return first->proto == second->proto
            && first->src_port_== second->src_port_
