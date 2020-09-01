@@ -33,4 +33,7 @@ extern test_case_t __stop_et_test_cases;
 #define TEST(tc_, num_workers_) ET_TEST_CASE_BASE(tc_, num_workers_) \
         static void tc_ (void)
 
+#define et_asserteq(a, b) \
+    assert(a == b);
+
 #endif /* CFT_TEST_RUNNER_ET_H_ */

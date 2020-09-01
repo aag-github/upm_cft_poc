@@ -51,5 +51,6 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+*.bak
 # Eclipse generated files
 Debug/

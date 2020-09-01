@@ -10,15 +10,15 @@
 #include "cft_up_messages.h"
 #include "cft_packet.h"
 
-bool break_loop = false;
+static bool break_loop = false;
 
-cft_message_async_queue_in_t  signal_in;
+static cft_message_async_queue_in_t  signal_in;
+static cft_local_socket_server_t data_queue;
 
-int ppid = 0;
+static int ppid = 0;
 
-size_t worker_index = -1;
+static size_t worker_index = -1;
 
-cft_local_socket_server_t data_queue;
 
 void cft_up_signal_handler(int signo)
 {
@@ -52,9 +52,9 @@ void cft_up_configure()
 }
 
 
-void cft_up_send_packet()
+void cft_up_handle_packet()
 {
-    cft_packet_t packet;;
+    cft_packet_t packet;
     cft_local_socket_server_read(&data_queue, &packet, sizeof(packet));
     printf("WORKER %d (%lu) GOT PACKET: proto: %d, src_port: %d, dst_port: %d, %s\n"
                 , getpid()
@@ -68,17 +68,28 @@ void cft_up_send_packet()
     cft_local_socket_server_write(&data_queue, &return_value, sizeof(return_value));
 }
 
-void cft_up_runner(size_t index)
+void cft_up_init()
 {
-    worker_index = index;
-    ppid = getppid();
-
     char pipe_name[QUEUE_NAME_MAX_SIZE];
     sprintf(pipe_name, "up_signal_in_%d", getpid());
     cft_signaled_pipe_in_init(&signal_in, pipe_name, SIGUSR1, cft_up_signal_handler);
 
     sprintf(pipe_name, "up_data_in_%d", getpid());
     cft_local_socket_server_init(&data_queue, pipe_name);
+}
+
+void cft_up_fini()
+{
+    cft_signaled_pipe_in_fini(&signal_in);
+    cft_local_socket_server_fini(&data_queue);
+}
+
+void cft_up_runner(size_t index)
+{
+    worker_index = index;
+    ppid = getppid();
+
+    cft_up_init();
 
     while(!break_loop) {
         if (ppid != getppid()) {
@@ -93,7 +104,7 @@ void cft_up_runner(size_t index)
                 cft_up_configure();
                 break;
             case DMT_PACKET:
-                cft_up_send_packet();
+                cft_up_handle_packet();
                 break;
             default:
                printf("************ Unexpected message: %d\n", msg);
@@ -103,6 +114,5 @@ void cft_up_runner(size_t index)
     }
     printf("UP done\n");
 
-    cft_signaled_pipe_in_fini(&signal_in);
-    cft_local_socket_server_fini(&data_queue);
+    cft_up_fini();
 }

@@ -9,6 +9,8 @@ bool cft_routing_manager_init();
 
 void cft_routing_manager_fini();
 
+void cft_routing_manager_clean();
+
 cft_flow_t* cft_routing_manager_add_flow(const cft_five_tuple_t* five_tuple, cft_worker_id_t next_hop);
 
 cft_flow_t* cft_routing_manager_find_flow(const cft_five_tuple_t* five_tuple);

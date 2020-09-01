@@ -20,6 +20,9 @@ int run_test(void(*test)(), size_t num_workers)
     }
 
     test();
+
+    cft_routing_manager_clean();
+
     return 1;
 }
 
@@ -47,9 +50,8 @@ int test_runner()
     et_get_all_tests(&test_cases, size);
 
     cft_log("%s: Starting test loop\n", __func__);
-    // For each test.... {
     for(int i = 0; i < size; i++) {
-        cft_log("%s", "running first test\n");
+        cft_log("%s: ======== running test %s ========\n", __func__, test_cases[i]->name);
         if(1 == run_test(test_cases[i]->func, test_cases[i]->num_workers)) {
             cft_worker_manager_stop_all_workers();
         } else {

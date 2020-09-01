@@ -2,13 +2,13 @@
 #include "et.h"
 #include "cft.h"
 
-
-TEST(dummy_test, 2)
+TEST(TC1_config, 2)
 {
     cft_config_manager_send_config_to_all_workers();
+}
 
-    printf("\n");
-
+TEST(TC1_packet_send, 3)
+{
     uint8_t raw_packets[4][3] = {
             { 1, 100, 80 },
             { 1, 80, 100 },
@@ -35,6 +35,4 @@ TEST(dummy_test, 2)
     cft_flow_set_next_hop(flow, cft_worker_manager_get_worker_id(0));
     cft_packet_manager_send_packet(&packets[3]);
 
-    printf("\n");
 }
-

@@ -17,6 +17,13 @@ bool cft_routing_manager_init()
     return true;
 }
 
+void cft_routing_manager_clean()
+{
+    free(routing_table.flows);
+    routing_table.flows = NULL;
+    routing_table.size = 0;
+}
+
 void cft_routing_manager_fini()
 {
     free(routing_table.flows);
