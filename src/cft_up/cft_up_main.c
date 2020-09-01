@@ -22,7 +22,7 @@ cft_local_socket_server_t data_queue;
 
 void cft_up_signal_handler(int signo)
 {
-    printf("received SIGUSR1!!!!!!!!!!!!!!!!!!!!!!!! %d\n", getpid());
+    printf("%d received signal\n", getpid());
 
     int msg_type;
     read(signal_in.pipe_.pipe_descriptor_, &msg_type, sizeof(msg_type));
@@ -81,17 +81,12 @@ void cft_up_runner(size_t index)
     cft_local_socket_server_init(&data_queue, pipe_name);
 
     while(!break_loop) {
-        //printf("WORKER SLEEPING: my id is %d\n\n", getpid());
-        //sleep(5);
-        //printf("WORKER RUNNING: my id is %d\n", getpid());
-
         if (ppid != getppid()) {
             break;
         }
 
         int msg = 0;
         int read_result = cft_local_socket_server_read(&data_queue, &msg, sizeof(msg));
-        //printf("WORKER %d GOT READ RESULT: %d\n", getpid(), read_result);
         if (read_result > 0) {
             switch(msg) {
             case DMT_CONFIG:

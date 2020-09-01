@@ -8,41 +8,7 @@
 #include "cft_packet_manager.h"
 #include "cft_worker_manager.h"
 #include "cft_routing_manager.h"
-
-
-void dummy_test() {
-    uint8_t raw_packets[4][3] = {
-            { 1, 100, 80 },
-            { 1, 80, 100 },
-            { 1, 99, 22 },
-            { 1, 22, 99 },
-    };
-
-    cft_packet_t packets[4];
-    cft_packet_init(&packets[0], raw_packets[0], PKT_DIR_UPLINK);
-    cft_packet_init(&packets[1], raw_packets[1], PKT_DIR_DOWNLINK);
-    cft_packet_init(&packets[2], raw_packets[2], PKT_DIR_UPLINK);
-    cft_packet_init(&packets[3], raw_packets[3], PKT_DIR_DOWNLINK);
-
-    printf("Press enter to send config %d\n", getpid());
-    getchar();
-    cft_config_manager_send_config_to_all_workers();
-    printf("Press enter to exit %d\n", getpid());
-
-    //Send packet 1 to worker 0
-    cft_packet_manager_send_packet(&packets[0]);
-    //Send packet 2 to worker 1
-    cft_routing_manager_add_flow(&packets[1].five_tuple_, cft_worker_manager_get_worker_id(1));
-    cft_packet_manager_send_packet(&packets[1]);
-    //Send packet 3 to worker 1
-    cft_routing_manager_add_flow(&packets[2].five_tuple_, cft_worker_manager_get_worker_id(1));
-    cft_packet_manager_send_packet(&packets[2]);
-    //Send packet 4 to worker 0
-    cft_flow_t* flow = cft_routing_manager_find_flow(&packets[3].five_tuple_);
-    cft_flow_set_next_hop(flow, cft_worker_manager_get_worker_id(0));
-    cft_packet_manager_send_packet(&packets[3]);
-    getchar();
-}
+#include "et.h"
 
 int run_test(void(*test)(), size_t num_workers)
 {
@@ -75,11 +41,16 @@ int test_runner()
 
     pid_t me = getpid();
 
+    const size_t size = et_test_case_count();
+    test_case_t* test_cases[size];
+    memset(test_cases, 0, sizeof(test_case_t*) * size);
+    et_get_all_tests(&test_cases, size);
+
     cft_log("%s: Starting test loop\n", __func__);
     // For each test.... {
-    for(int i = 2; i <= 2; i++) {
+    for(int i = 0; i < size; i++) {
         cft_log("%s", "running first test\n");
-        if(1 == run_test(dummy_test, i)) {
+        if(1 == run_test(test_cases[i]->func, test_cases[i]->num_workers)) {
             cft_worker_manager_stop_all_workers();
         } else {
             break;
