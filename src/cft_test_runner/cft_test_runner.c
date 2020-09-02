@@ -8,6 +8,7 @@
 #include "cft_packet_manager.h"
 #include "cft_worker_manager.h"
 #include "cft_routing_manager.h"
+#include "stats.h"
 #include "et.h"
 
 int run_test(void(*test)(), size_t num_workers)
@@ -18,10 +19,12 @@ int run_test(void(*test)(), size_t num_workers)
             return 0;
         }
     }
+    stats_init();
 
     test();
 
     cft_routing_manager_clean();
+    stats_fini();
 
     return 1;
 }
@@ -47,10 +50,10 @@ int test_runner()
     const size_t size = et_test_case_count();
     test_case_t* test_cases[size];
     memset(test_cases, 0, sizeof(test_case_t*) * size);
-    et_get_all_tests(&test_cases, size);
+    const size_t tc_count = et_get_all_tests(&test_cases, size);
 
     cft_log("%s: Starting test loop\n", __func__);
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < tc_count; i++) {
         cft_log("%s: ======== running test %s ========\n", __func__, test_cases[i]->name);
         if(1 == run_test(test_cases[i]->func, test_cases[i]->num_workers)) {
             cft_worker_manager_stop_all_workers();

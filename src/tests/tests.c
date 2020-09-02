@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "et.h"
 #include "cft.h"
+#include "stats.h"
 
 TEST(TC1_config, 2)
 {
@@ -34,5 +35,7 @@ TEST(TC2_packet_send, 3)
     cft_flow_t* flow = cft_routing_manager_find_flow(&packets[3].five_tuple_);
     cft_flow_set_next_hop(flow, cft_worker_manager_get_worker_id(0));
     cft_packet_manager_send_packet(&packets[3]);
+
+    et_asserteq(4, stats_get_packet_counter());
 
 }

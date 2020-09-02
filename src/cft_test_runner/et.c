@@ -1,6 +1,8 @@
 #include <common_c.h>
 #include "et.h"
 
+char filter_[100];
+
 size_t
 et_test_case_count(void)
 {
@@ -14,7 +16,14 @@ et_get_all_tests(test_case_t** test_cases, size_t size)
 {
     size_t tc_count = 0;
     for (test_case_t* tc = &__start_et_test_cases; tc < &__stop_et_test_cases && tc_count < size; ++tc) {
-        test_cases[tc_count++] = tc;
+        if(!*filter_ || strstr(tc->name, filter_)) {
+            test_cases[tc_count++] = tc;
+        }
     }
     return tc_count;
+}
+
+void et_set_filter(const char* filter)
+{
+    strncpy(filter_, filter, sizeof(filter_));
 }

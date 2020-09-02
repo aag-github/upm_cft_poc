@@ -10,6 +10,8 @@
 #include "cft_up_messages.h"
 #include "cft_packet.h"
 
+#include "stats.h"
+
 static bool break_loop = false;
 
 static cft_message_async_queue_in_t  signal_in;
@@ -63,7 +65,7 @@ void cft_up_handle_packet()
                 , packet.five_tuple_.src_port_
                 , packet.five_tuple_.dst_port_
                 , packet.uplink_ ? "uplink" : "downlink");
-
+    stats_increment_packet_counter();
     int return_value = DMT_RETURN_OK;
     cft_local_socket_server_write(&data_queue, &return_value, sizeof(return_value));
 }
@@ -76,12 +78,16 @@ void cft_up_init()
 
     sprintf(pipe_name, "up_data_in_%d", getpid());
     cft_local_socket_server_init(&data_queue, pipe_name);
+
+    stats_init();
 }
 
 void cft_up_fini()
 {
     cft_signaled_pipe_in_fini(&signal_in);
     cft_local_socket_server_fini(&data_queue);
+
+    stats_fini();
 }
 
 void cft_up_runner(size_t index)

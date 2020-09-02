@@ -12,6 +12,7 @@ typedef struct test_case_s test_case_t;
 
 size_t et_test_case_count();
 size_t et_get_all_tests();
+void et_set_filter(const char* filter);
 
 //private
 extern test_case_t __start_et_test_cases;
