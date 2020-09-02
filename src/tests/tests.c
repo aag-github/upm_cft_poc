@@ -7,7 +7,7 @@ TEST(TC1_config, 2)
     cft_config_manager_send_config_to_all_workers();
 }
 
-TEST(TC1_packet_send, 3)
+TEST(TC2_packet_send, 3)
 {
     uint8_t raw_packets[4][3] = {
             { 1, 100, 80 },
